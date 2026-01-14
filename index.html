@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mad Shooting App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { background-color: #000; color: white; font-family: sans-serif; }
+        .glass-card { background: rgba(20, 20, 20, 0.9); border: 1px solid #FF4500; border-radius: 12px; }
+        .neon-btn { background-color: #FF4500; color: white; font-weight: bold; border: none; cursor: pointer; }
+        .hidden-view { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <section id="view-auth" class="min-h-screen flex flex-col items-center justify-center p-6">
+        <h1 class="text-3xl font-black italic mb-6 text-[#FF4500]">MAD SHOOTING</h1>
+        <div class="glass-card p-8 w-full max-w-sm space-y-4">
+            <h2 id="auth-title" class="text-center font-bold uppercase">Únete al Club</h2>
+            <div id="reg-fields">
+                <input type="text" id="auth-name" placeholder="Tu Nombre" class="w-full bg-zinc-900 p-3 rounded mb-4 text-white outline-none">
+            </div>
+            <input type="email" id="auth-email" placeholder="Correo electrónico" class="w-full bg-zinc-900 p-3 rounded text-white outline-none">
+            <input type="password" id="auth-pass" placeholder="Contraseña" class="w-full bg-zinc-900 p-3 rounded text-white outline-none">
+            <button onclick="forzarEntrada()" class="neon-btn w-full py-4 rounded uppercase">Entrar Ahora</button>
+            <p class="text-[10px] text-center text-gray-500 mt-4 cursor-pointer underline" onclick="toggle()">¿Ya tienes cuenta? Click aquí</p>
+        </div>
+    </section>
+
+    <section id="view-home" class="hidden-view p-6 pb-28">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold italic">¡Hola, <span id="user-name"></span>!</h2>
+            <button id="admin-gear" class="hidden-view text-2xl text-[#FF4500]" onclick="showAdmin()"><i class="fas fa-cog"></i></button>
+        </div>
+        <div class="glass-card p-6 mb-8 text-center">
+            <p class="text-[10px] text-gray-400">TARJETA DE PUNTOS</p>
+            <p class="text-5xl font-black text-[#FF4500]">0</p>
+        </div>
+        <div id="catalog" class="space-y-4"></div>
+    </section>
+
+    <section id="view-admin" class="hidden-view p-6">
+        <h2 class="text-2xl font-bold text-[#FF4500] mb-6">PANEL ADMIN</h2>
+        <div class="glass-card p-4 mb-4">
+            <p class="text-xs mb-2">Enviar aviso a todos:</p>
+            <input type="text" placeholder="Escribe aquí..." class="w-full bg-black p-2 rounded text-xs mb-2 border border-zinc-700 text-white">
+            <button class="bg-white text-black px-4 py-1 rounded font-bold text-xs" onclick="alert('Enviado')">ENVIAR</button>
+        </div>
+        <button class="underline text-xs" onclick="location.reload()">CERRAR SESIÓN</button>
+    </section>
+</div>
+
+<script>
+    let isLogin = false;
+
+    function toggle() {
+        isLogin = !isLogin;
+        document.getElementById('reg-fields').classList.toggle('hidden-view');
+        document.getElementById('auth-title').innerText = isLogin ? 'Inicia Sesión' : 'Únete al Club';
+    }
+
+    function forzarEntrada() {
+        const email = document.getElementById('auth-email').value;
+        const nombre = document.getElementById('auth-name').value || 'Socio';
+
+        if(!email) {
+            alert("Maddie dice: ¡Necesito tu email!");
+            return;
+        }
+
+        // OCULTAR LOGIN, MOSTRAR HOME
+        document.getElementById('view-auth').classList.add('hidden-view');
+        document.getElementById('view-home').classList.remove('hidden-view');
+        document.getElementById('user-name').innerText = nombre;
+
+        // ACTIVAR ADMIN SI ES TU CORREO
+        if(email.toLowerCase() === 'info@bartolomephotography.es') {
+            document.getElementById('admin-gear').classList.remove('hidden-view');
+            alert("¡Bienvenido Jefe! Panel de admin activado.");
+        }
+
+        renderCatalog();
+    }
+
+    function renderCatalog() {
+        const sesion = [
+            {n: 'Detective Noir', f: '21 Feb', h: '13:00h'},
+            {n: 'Harley Quinn', f: '21/22 Mar', h: '17:00h'},
+            {n: 'Pin-Up Classic', f: '25/26 Abr', h: '17:00h'}
+        ];
+        const c = document.getElementById('catalog');
+        c.innerHTML = '';
+        sesion.forEach(s => {
+            c.innerHTML += `
+                <div class="glass-card p-5">
+                    <h3 class="font-bold text-[#FF4500]">${s.n}</h3>
+                    <p class="text-[10px] text-gray-400">${s.f} - ${s.h}</p>
+                    <button class="neon-btn w-full py-2 mt-4 rounded text-xs" onclick="alert('Reserva enviada')">RESERVAR (15€)</button>
+                </div>`;
+        });
+    }
+
+    function showAdmin() {
+        document.getElementById('view-home').classList.add('hidden-view');
+        document.getElementById('view-admin').classList.remove('hidden-view');
+    }
+</script>
+</body>
+</html>
