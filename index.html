@@ -1,44 +1,148 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Test Mad Shooting</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mad Shooting App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: black; color: orange; font-family: sans-serif; text-align: center; padding-top: 50px; }
-        input { padding: 10px; margin: 10px; width: 80%; max-width: 300px; }
-        button { padding: 15px 30px; background: orange; color: black; font-weight: bold; cursor: pointer; border: none; }
+        :root { --neon: #FF4500; }
+        body { background-color: #000; color: white; font-family: 'Segoe UI', sans-serif; }
+        .glass { background: rgba(20, 20, 20, 0.95); border: 1px solid rgba(255, 69, 0, 0.3); border-radius: 15px; }
+        .btn-neon { background: var(--neon); color: white; font-weight: bold; transition: 0.3s; }
+        .btn-neon:hover { box-shadow: 0 0 15px var(--neon); transform: scale(1.02); }
+        .hidden-view { display: none !important; }
     </style>
 </head>
 <body>
-    <h1>MAD SHOOTING TEST</h1>
-    <input type="email" id="email" placeholder="Pon tu correo aquí">
-    <br>
-    <button onclick="entrar()">PROBAR BOTÓN ENTRAR</button>
 
-    <div id="mensaje" style="display:none; margin-top: 50px;">
-        <h2>¡FUNCIONA!</h2>
-        <p id="admin-text"></p>
+<div id="maddie" class="fixed bottom-6 right-6 z-50 cursor-pointer" onclick="maddieTalk()">
+    <div id="maddie-msg" class="hidden absolute -top-12 right-0 bg-white text-black text-[10px] font-bold p-2 rounded-lg w-32 shadow-lg">
+        ¡Hacemos magia!
     </div>
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" class="w-14 h-14 rounded-full border-2 border-orange-600 bg-black">
+</div>
 
-    <script>
-        function entrar() {
-            const correo = document.getElementById('email').value;
-            if(!correo) {
-                alert("Escribe un correo para probar");
-                return;
-            }
-            
-            document.querySelector('h1').style.display = 'none';
-            document.getElementById('email').style.display = 'none';
-            document.querySelector('button').style.display = 'none';
-            
-            document.getElementById('mensaje').style.display = 'block';
-            
-            if(correo.toLowerCase() === 'info@bartolomephotography.es') {
-                document.getElementById('admin-text').innerText = "Eres el ADMIN. El engranaje saldría aquí.";
-            } else {
-                document.getElementById('admin-text').innerText = "Eres un usuario normal.";
-            }
+<div id="app-content">
+    <section id="view-login" class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+        <h1 class="text-4xl font-black italic mb-2 text-orange-600 tracking-tighter">MAD SHOOTING</h1>
+        <p class="text-[10px] text-zinc-500 mb-8 uppercase tracking-[0.3em]">Cinematic Photo Club</p>
+        
+        <div class="glass p-8 w-full max-w-sm space-y-4">
+            <h2 id="title-mode" class="text-lg font-bold uppercase italic">Únete al Club</h2>
+            <div id="extra-fields">
+                <input type="text" id="reg-name" placeholder="Tu Nombre" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-lg text-sm outline-none">
+            </div>
+            <input type="email" id="reg-email" placeholder="Correo electrónico" class="w-full bg-zinc-900 border border-zinc-800 p-4 rounded-lg text-sm outline-none">
+            <button onclick="acceder()" class="btn-neon w-full py-4 rounded-lg uppercase text-sm tracking-widest">Entrar Ahora</button>
+            <p class="text-[10px] text-zinc-500 mt-4 cursor-pointer underline" onclick="toggleLogin()">¿Ya eres miembro? Inicia sesión</p>
+        </div>
+    </section>
+
+    <section id="view-home" class="hidden-view p-6 pb-32">
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-2xl font-bold italic">Hola, <span id="user-display" class="text-orange-500"></span></h2>
+                <p class="text-[10px] text-zinc-500 uppercase">Socio Activo</p>
+            </div>
+            <button id="admin-btn" class="hidden-view text-2xl text-orange-500" onclick="showAdmin()">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+
+        <div class="glass p-6 mb-8 text-center bg-gradient-to-b from-zinc-900 to-black">
+            <p class="text-[10px] text-zinc-400 uppercase tracking-widest">Puntos Mad Shooting</p>
+            <p class="text-6xl font-black text-orange-500 my-2">0</p>
+            <p class="text-[9px] text-zinc-500 italic">¡A la 10ª sesión invitas tú!</p>
+        </div>
+
+        <h3 class="font-bold mb-4 uppercase text-xs border-l-2 border-orange-500 pl-2">Sesiones Disponibles</h3>
+        <div id="catalog-list" class="space-y-4"></div>
+    </section>
+
+    <section id="view-admin" class="hidden-view p-6">
+        <div class="flex items-center gap-4 mb-8">
+            <button onclick="showHome()" class="text-orange-500"><i class="fas fa-arrow-left"></i></button>
+            <h2 class="text-xl font-bold uppercase">Panel de Control</h2>
+        </div>
+        <div class="glass p-6 space-y-6">
+            <div>
+                <label class="text-[10px] text-zinc-400 uppercase">Aviso Urgente en App</label>
+                <input type="text" id="admin-msg" placeholder="Ej: Cambio de hora..." class="w-full bg-zinc-900 p-4 mt-2 rounded-lg text-sm">
+            </div>
+            <button onclick="alert('Aviso publicado')" class="btn-neon w-full py-3 rounded-lg text-xs uppercase">Publicar Aviso</button>
+        </div>
+    </section>
+</div>
+
+<script>
+    let isLogin = false;
+    const sesiones = [
+        { id:1, tit: 'Detective Noir', fecha: '21 FEB', hora: '13:00h', plazas: 10, precio: 15 },
+        { id:2, tit: 'Harley Quinn D1', fecha: '21 MAR', hora: '17:00h', plazas: 6, precio: 15 },
+        { id:3, tit: 'Harley Quinn D2', fecha: '22 MAR', hora: '17:00h', plazas: 6, precio: 15 },
+        { id:4, tit: 'Pin-Up D1', fecha: '25 ABR', hora: '17:00h', plazas: 10, precio: 15 }
+    ];
+
+    function toggleLogin() {
+        isLogin = !isLogin;
+        document.getElementById('extra-fields').classList.toggle('hidden-view');
+        document.getElementById('title-mode').innerText = isLogin ? 'Inicia Sesión' : 'Únete al Club';
+    }
+
+    function acceder() {
+        const email = document.getElementById('reg-email').value;
+        const nombre = document.getElementById('reg-name').value || 'Socio';
+
+        if(!email) return alert("Maddie dice: ¡Necesito tu email!");
+
+        document.getElementById('view-login').classList.add('hidden-view');
+        document.getElementById('view-home').classList.remove('hidden-view');
+        document.getElementById('user-display').innerText = nombre;
+
+        if(email.toLowerCase() === 'info@bartolomephotography.es') {
+            document.getElementById('admin-btn').classList.remove('hidden-view');
         }
-    </script>
+        renderCatalog();
+    }
+
+    function renderCatalog() {
+        const list = document.getElementById('catalog-list');
+        list.innerHTML = '';
+        sesiones.forEach(s => {
+            list.innerHTML += `
+                <div class="glass p-5">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-orange-500 italic">${s.tit}</h4>
+                        <span class="text-[10px] font-bold bg-orange-950 text-orange-500 px-2 py-1 rounded">${s.precio}€</span>
+                    </div>
+                    <p class="text-[10px] text-zinc-400 mb-4">${s.fecha} — ${s.hora}</p>
+                    <button onclick="reservar('${s.tit}')" class="btn-neon w-full py-3 rounded-lg text-[10px] uppercase tracking-widest">Reservar Plaza</button>
+                </div>`;
+        });
+    }
+
+    function reservar(titulo) {
+        alert(`¡Reserva para ${titulo} iniciada!\n\nEnvía el pago por PayPal a jfelixbart@yahoo.es para confirmar.`);
+    }
+
+    function showAdmin() {
+        document.getElementById('view-home').classList.add('hidden-view');
+        document.getElementById('view-admin').classList.remove('hidden-view');
+    }
+
+    function showHome() {
+        document.getElementById('view-admin').classList.add('hidden-view');
+        document.getElementById('view-home').classList.remove('hidden-view');
+    }
+
+    function maddieTalk() {
+        const msg = document.getElementById('maddie-msg');
+        const frases = ["¡Limpia el sensor!", "¡Usa focal fija!", "¡Sube el ISO!", "¡Eres un crack!"];
+        msg.innerText = frases[Math.floor(Math.random()*frases.length)];
+        msg.classList.toggle('hidden-view');
+    }
+</script>
 </body>
 </html>
