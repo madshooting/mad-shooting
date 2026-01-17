@@ -3,17 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD V7</title>
-    <script type="module" src="./assets/index-c_2nedgz.js"></script>
-    <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
-    
+    <title>MAD V5</title>
+    <script type="module" src="/assets/index-c_2nedgz.js"></script>
+    <link rel="stylesheet" href="/assets/index-Di99_S8u.css">
     <style>
         .btn-borrar-mad {
             position: absolute !important; top: 10px !important; right: 10px !important;
             background: #2563eb !important; color: white !important;
             border: 2px solid white !important; border-radius: 10px !important;
-            padding: 8px 12px !important; z-index: 99999 !important; font-weight: bold !important;
-            cursor: pointer !important;
+            padding: 8px !important; z-index: 99999 !important; font-weight: bold !important;
         }
     </style>
 </head>
@@ -26,14 +24,14 @@
                     t.style.position = 'relative';
                     const b = document.createElement('button');
                     b.className = 'btn-borrar-mad';
-                    b.innerHTML = 'BORRAR';
+                    b.innerHTML = 'ELIMINAR';
                     b.onclick = (e) => { e.stopPropagation(); if(confirm('¿Borrar?')) t.remove(); };
                     t.appendChild(b);
                     const h = t.querySelector('h4, .font-black');
                     if(h) h.contentEditable = "true";
                 }
             });
-        }, 1500);
+        }, 1000);
     </script>
 </body>
 </html>
