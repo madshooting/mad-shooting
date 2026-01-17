@@ -3,52 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD SHOOTING | PANEL</title>
+    <title>MAD SHOOTING | JEFE</title>
     <script type="module" src="./assets/index-c_2nedgz.js"></script>
     <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
     <style>
-        /* ESTO CORRIGE EL DISEÑO GIGANTE */
-        body { 
-            background-color: #000 !important; 
-            margin: 0 !important; 
-            display: flex !important; 
-            justify-content: center !important; 
-            align-items: flex-start !important; 
-            min-height: 100vh !important;
+        /* BLOQUEO DE TAMAÑO PARA MÓVIL Y PC */
+        html, body {
+            background-color: #000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow-x: hidden !important;
+            font-size: 14px !important; /* Forzamos un tamaño de letra base normal */
         }
-        #root { 
-            width: 100% !important; 
-            max-width: 430px !important; /* Ancho de un iPhone Pro Max */
+
+        #root {
+            width: 100% !important;
+            max-width: 430px !important; /* Tamaño estándar de móvil */
             margin: 0 auto !important;
             min-height: 100vh !important;
-            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            background: #000 !important;
         }
-        /* Botones de gestión */
+
+        /* ESTO EVITA QUE LAS FOTOS Y TEXTOS SE HAGAN GIGANTES */
+        #root * {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        h2, h3, h4 { font-size: 1.2rem !important; } /* Títulos normales */
+        p { font-size: 0.8rem !important; } /* Textos pequeños */
+
+        /* Ajuste del logo de Maddie para que no ocupe toda la pantalla */
+        img {
+            max-height: 200px !important;
+            width: auto !important;
+            margin: 0 auto !important;
+            display: block !important;
+        }
+
         .btn-borrar-mad {
-            position: absolute !important; top: 15px !important; right: 15px !important;
+            position: absolute !important; top: 10px !important; right: 10px !important;
             background: #2563eb !important; color: white !important;
             border: none !important; border-radius: 8px !important;
-            padding: 6px 12px !important; z-index: 99999 !important; font-size: 10px !important;
-            font-weight: bold !important; cursor: pointer !important;
+            padding: 5px 10px !important; z-index: 99999 !important; 
+            font-size: 10px !important; font-weight: bold !important;
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script>
-        // Entrar directo como jefe
         localStorage.setItem('userEmail', 'info@bartolomephotography.es');
         localStorage.setItem('isAdmin', 'true');
 
         setInterval(() => {
-            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
-            tarjetas.forEach(t => {
+            document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]').forEach(t => {
                 if ((t.innerText.includes('MAR') || t.innerText.includes('Reserva')) && !t.querySelector('.btn-borrar-mad')) {
                     t.style.position = 'relative';
                     const b = document.createElement('button');
                     b.className = 'btn-borrar-mad';
-                    b.innerHTML = 'BORRAR';
-                    b.onclick = (e) => { e.stopPropagation(); if(confirm('¿Borrar sesión?')) t.remove(); };
+                    b.innerHTML = 'ELIMINAR';
+                    b.onclick = (e) => { e.stopPropagation(); if(confirm('¿Borrar?')) t.remove(); };
                     t.appendChild(b);
                     const h = t.querySelector('h4, .font-black');
                     if(h) h.contentEditable = "true";
