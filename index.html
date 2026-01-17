@@ -7,94 +7,91 @@
     <script type="module" src="./assets/index-c_2nedgz.js"></script>
     <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
     <style>
-        /* Bloqueo de desbordamiento */
-        html, body {
+        /* RESET TOTAL PARA QUE NO SE VEA GIGANTE */
+        html { font-size: 12px !important; } /* Bajamos el tamaño de letra base */
+        
+        body {
             background-color: #000 !important;
             margin: 0 !important;
             padding: 0 !important;
+            display: flex !important;
+            justify-content: center !important;
             overflow-x: hidden !important;
         }
 
-        /* Contenedor principal centrado y con tamaño real de móvil */
         #root {
-            max-width: 430px !important;
-            margin: 0 auto !important;
-            position: relative !important;
+            width: 100vw !important;
+            max-width: 430px !important; /* Ancho de iPhone */
+            min-height: 100vh !important;
+            transform-origin: top center;
         }
 
-        /* Estilo para los botones de eliminar (más pequeños y discretos) */
-        .btn-borrar-mad {
-            position: absolute !important;
-            top: 10px !important;
-            right: 10px !important;
-            background: rgba(239, 68, 68, 0.9) !important; /* Rojo semi-transparente */
-            color: white !important;
-            border: none !important;
-            border-radius: 6px !important;
-            padding: 4px 8px !important;
-            font-size: 9px !important;
-            font-weight: bold !important;
-            z-index: 99999 !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-        }
-
-        /* Arreglo para que las imágenes no se vean gigantes */
-        img {
+        /* AJUSTE DE IMÁGENES Y CONTENEDORES */
+        div, section, img {
             max-width: 100% !important;
             height: auto !important;
-            border-radius: 20px !important;
         }
 
-        /* Línea naranja solo cuando editas texto */
-        [contenteditable="true"]:focus {
-            outline: none !important;
-            border-bottom: 2px solid #f97316 !important;
+        /* BOTÓN DE BORRAR DISCRETO */
+        .btn-borrar-mad {
+            position: absolute !important;
+            top: 8px !important;
+            right: 8px !important;
+            background: rgba(255, 0, 0, 0.7) !important;
+            color: white !important;
+            border: 1px solid white !important;
+            border-radius: 4px !important;
+            padding: 3px 6px !important;
+            font-size: 9px !important;
+            z-index: 99999 !important;
+            cursor: pointer !important;
         }
+
+        /* Quitar bordes naranjas feos */
+        [contenteditable="true"] { outline: none !important; }
+        [contenteditable="true"]:focus { border-bottom: 1px dashed #f97316 !important; }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script>
-        // Acceso directo de Jefe
+        // Forzar modo jefe
         localStorage.setItem('userEmail', 'info@bartolomephotography.es');
         localStorage.setItem('isAdmin', 'true');
 
-        function limpiarApp() {
-            // Buscamos las tarjetas que REALMENTE son sesiones
-            // Filtramos para NO tocar logos de Maddie ni botones de WhatsApp
-            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
+        function aplicarParche() {
+            // Buscamos solo los bloques de sesiones
+            const bloques = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded-3xl"]');
             
-            tarjetas.forEach(t => {
-                const contenido = t.innerText.toUpperCase();
+            bloques.forEach(el => {
+                const texto = el.innerText.toUpperCase();
                 
-                // Solo actuamos si tiene palabras de sesión (FECHA o RESERVAR)
-                // Y evitamos tocar los iconos de Maddie (que no tienen texto largo)
-                if ((contenido.includes('MAR') || contenido.includes('FEB') || contenido.includes('RESERVAR')) 
-                    && !contenido.includes('WHATSAPP') 
-                    && !t.querySelector('.btn-borrar-mad')
-                    && t.innerText.length > 10) {
+                // Si parece una sesión y no es el botón de WhatsApp
+                if ((texto.includes('MAR') || texto.includes('FEB') || texto.includes('RESERVAR')) 
+                    && !texto.includes('DUDAS') && !el.querySelector('.btn-borrar-mad')) {
                     
-                    t.style.position = 'relative';
-
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-borrar-mad';
-                    btn.innerText = 'QUITAR';
-                    btn.onclick = (e) => {
+                    el.style.position = 'relative';
+                    
+                    // Crear botón
+                    const b = document.createElement('button');
+                    b.className = 'btn-borrar-mad';
+                    b.innerText = 'BORRAR';
+                    b.onclick = (e) => {
                         e.stopPropagation();
-                        if(confirm('¿Eliminar esta sesión?')) t.remove();
+                        if(confirm('¿Quitar de la lista?')) el.remove();
                     };
-                    t.appendChild(btn);
+                    el.appendChild(b);
 
-                    // Hacer editables solo los títulos h4
-                    const titulo = t.querySelector('h4');
-                    if (titulo) titulo.contentEditable = "true";
+                    // Hacer títulos editables
+                    const h4 = el.querySelector('h4');
+                    if(h4) h4.contentEditable = "true";
                 }
             });
         }
 
-        // Ejecutar cada 1.5 segundos
-        setInterval(limpiarApp, 1500);
+        // Ejecutar rápido al principio y luego cada 2 segundos
+        setTimeout(aplicarParche, 500);
+        setInterval(aplicarParche, 2000);
     </script>
 </body>
 </html>
