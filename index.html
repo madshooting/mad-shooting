@@ -3,75 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD SHOOTING | JEFE</title>
+    <title>MAD SHOOTING</title>
     <script type="module" src="./assets/index-c_2nedgz.js"></script>
     <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
     <style>
-        /* BLOQUEO DE TAMAÑO PARA MÓVIL Y PC */
+        /* Bloqueo de desbordamiento */
         html, body {
             background-color: #000 !important;
             margin: 0 !important;
             padding: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
             overflow-x: hidden !important;
-            font-size: 14px !important; /* Forzamos un tamaño de letra base normal */
         }
 
+        /* Contenedor principal centrado y con tamaño real de móvil */
         #root {
-            width: 100% !important;
-            max-width: 430px !important; /* Tamaño estándar de móvil */
+            max-width: 430px !important;
             margin: 0 auto !important;
-            min-height: 100vh !important;
-            background: #000 !important;
+            position: relative !important;
         }
 
-        /* ESTO EVITA QUE LAS FOTOS Y TEXTOS SE HAGAN GIGANTES */
-        #root * {
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-        }
-
-        h2, h3, h4 { font-size: 1.2rem !important; } /* Títulos normales */
-        p { font-size: 0.8rem !important; } /* Textos pequeños */
-
-        /* Ajuste del logo de Maddie para que no ocupe toda la pantalla */
-        img {
-            max-height: 200px !important;
-            width: auto !important;
-            margin: 0 auto !important;
-            display: block !important;
-        }
-
+        /* Estilo para los botones de eliminar (más pequeños y discretos) */
         .btn-borrar-mad {
-            position: absolute !important; top: 10px !important; right: 10px !important;
-            background: #2563eb !important; color: white !important;
-            border: none !important; border-radius: 8px !important;
-            padding: 5px 10px !important; z-index: 99999 !important; 
-            font-size: 10px !important; font-weight: bold !important;
+            position: absolute !important;
+            top: 10px !important;
+            right: 10px !important;
+            background: rgba(239, 68, 68, 0.9) !important; /* Rojo semi-transparente */
+            color: white !important;
+            border: none !important;
+            border-radius: 6px !important;
+            padding: 4px 8px !important;
+            font-size: 9px !important;
+            font-weight: bold !important;
+            z-index: 99999 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 1px !important;
+        }
+
+        /* Arreglo para que las imágenes no se vean gigantes */
+        img {
+            max-width: 100% !important;
+            height: auto !important;
+            border-radius: 20px !important;
+        }
+
+        /* Línea naranja solo cuando editas texto */
+        [contenteditable="true"]:focus {
+            outline: none !important;
+            border-bottom: 2px solid #f97316 !important;
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
     <script>
+        // Acceso directo de Jefe
         localStorage.setItem('userEmail', 'info@bartolomephotography.es');
         localStorage.setItem('isAdmin', 'true');
 
-        setInterval(() => {
-            document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]').forEach(t => {
-                if ((t.innerText.includes('MAR') || t.innerText.includes('Reserva')) && !t.querySelector('.btn-borrar-mad')) {
+        function limpiarApp() {
+            // Buscamos las tarjetas que REALMENTE son sesiones
+            // Filtramos para NO tocar logos de Maddie ni botones de WhatsApp
+            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
+            
+            tarjetas.forEach(t => {
+                const contenido = t.innerText.toUpperCase();
+                
+                // Solo actuamos si tiene palabras de sesión (FECHA o RESERVAR)
+                // Y evitamos tocar los iconos de Maddie (que no tienen texto largo)
+                if ((contenido.includes('MAR') || contenido.includes('FEB') || contenido.includes('RESERVAR')) 
+                    && !contenido.includes('WHATSAPP') 
+                    && !t.querySelector('.btn-borrar-mad')
+                    && t.innerText.length > 10) {
+                    
                     t.style.position = 'relative';
-                    const b = document.createElement('button');
-                    b.className = 'btn-borrar-mad';
-                    b.innerHTML = 'ELIMINAR';
-                    b.onclick = (e) => { e.stopPropagation(); if(confirm('¿Borrar?')) t.remove(); };
-                    t.appendChild(b);
-                    const h = t.querySelector('h4, .font-black');
-                    if(h) h.contentEditable = "true";
+
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-borrar-mad';
+                    btn.innerText = 'QUITAR';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        if(confirm('¿Eliminar esta sesión?')) t.remove();
+                    };
+                    t.appendChild(btn);
+
+                    // Hacer editables solo los títulos h4
+                    const titulo = t.querySelector('h4');
+                    if (titulo) titulo.contentEditable = "true";
                 }
             });
-        }, 1500);
+        }
+
+        // Ejecutar cada 1.5 segundos
+        setInterval(limpiarApp, 1500);
     </script>
 </body>
 </html>
