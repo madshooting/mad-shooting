@@ -3,187 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mad Shooting</title>
+    <title>Mad Shooting | Cinematic Club</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 </head>
-<body class="bg-black text-white font-sans">
+<body class="bg-black text-white font-sans selection:bg-orange-500">
     <div id="root"></div>
 
     <script>
-        // --- TU BASE DE DATOS ---
+        // --- BASE DE DATOS CENTRALIZADA ---
         const APP_DATABASE = {
             company: {
                 name: "Mad Shooting",
                 logo: "https://raw.githubusercontent.com/FelixBartolome/MadShooting/main/Maddie.png"
             },
             admin: { email: "info@bartolomephotography.es" },
-            proximasSesiones: [
+            sesiones: [
                 { id: 301, tema: "GOLDEN HOUR", fecha: "SÁB 08 MAR" },
-                { id: 302, tema: "URBAN STYLE", fecha: "DOM 16 MAR" }
+                { id: 302, tema: "URBAN STYLE", fecha: "DOM 16 MAR" },
+                { id: 303, tema: "FEMME FATALE", fecha: "SÁB 21 FEB" }
             ]
         };
 
-        // Estado básico
-        let emailLogueado = "";
-        let isAdminMode = false;
+        // Variables de estado
+        let userEmail = "";
+        let isAdminView = false;
+        let puntosFidelidad = 0;
 
-        function renderApp() {
+        function render() {
             const root = document.getElementById('root');
-            const esAdmin = emailLogueado.toLowerCase().trim() === APP_DATABASE.admin.email.toLowerCase();
+            const esAdmin = userEmail.toLowerCase().trim() === APP_DATABASE.admin.email.toLowerCase();
 
-            if (!emailLogueado) {
+            if (!userEmail) {
+                // PANTALLA DE LOGIN
                 root.innerHTML = `
-                    <div class="min-h-screen flex flex-col items-center justify-center px-10 text-center">
-                        <img src="${APP_DATABASE.company.logo}" class="w-40 h-40 rounded-full border-2 border-orange-500 mb-8 object-cover">
-                        <h1 class="text-4xl font-black italic uppercase mb-1">${APP_DATABASE.company.name}</h1>
-                        <p class="text-orange-500 font-black uppercase text-[10px] mb-12 italic">Cinematic Club</p>
-                        <input id="emailField" type="email" placeholder="Email" class="w-full bg-zinc-900 border border-zinc-800 p-5 rounded-2xl text-sm mb-3 outline-none focus:border-orange-500">
-                        <button onclick="login()" class="w-full py-5 bg-orange-500 text-black font-black uppercase text-xs rounded-2xl">Entrar</button>
+                    <div class="min-h-screen flex flex-col items-center justify-center px-10 text-center bg-black">
+                        <img src="${APP_DATABASE.company.logo}" class="w-44 h-44 rounded-full border-2 border-orange-500 mb-8 object-cover shadow-[0_0_40px_rgba(249,115,22,0.2)]">
+                        <h1 class="text-4xl font-black italic uppercase tracking-tighter text-white">MAD SHOOTING</h1>
+                        <p class="text-orange-500 font-black uppercase tracking-[0.4em] text-[10px] mb-12">Cinematic Club</p>
+                        <div class="w-full space-y-3">
+                            <input id="emailInput" type="email" placeholder="Email del Socio" class="w-full bg-zinc-900 border border-zinc-800 p-5 rounded-2xl text-sm outline-none focus:border-orange-500 text-white">
+                            <input type="password" placeholder="Contraseña" class="w-full bg-zinc-900 border border-zinc-800 p-5 rounded-2xl text-sm outline-none focus:border-orange-500 text-white">
+                            <button onclick="doLogin()" class="w-full py-5 bg-orange-500 text-black font-black uppercase text-xs tracking-widest rounded-2xl mt-4 active:scale-95 transition-all shadow-lg shadow-orange-500/20">Entrar</button>
+                        </div>
                     </div>`;
-            } else if (isAdminMode) {
+            } else if (isAdminView) {
+                // PANEL DE JEFE
                 root.innerHTML = `
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-10">
-                            <h2 class="text-2xl font-black text-orange-500 uppercase italic">Panel Jefe</h2>
-                            <button onclick="toggleAdmin(false)" class="bg-white text-black px-5 py-2 rounded-full text-[10px] font-black uppercase">Cerrar</button>
+                    <div class="min-h-screen p-6 bg-zinc-950">
+                        <header class="flex justify-between items-center mb-10">
+                            <h2 class="text-2xl font-black italic text-orange-500 uppercase">Panel Jefe</h2>
+                            <button onclick="setAdminView(false)" class="bg-white text-black px-6 py-2 rounded-full text-[10px] font-black uppercase">Volver</button>
+                        </header>
+                        <div class="bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-800 text-center shadow-xl">
+                            <p class="text-[10px] text-zinc-500 font-black uppercase mb-4 tracking-widest">Puntos del Socio</p>
+                            <div class="flex justify-center items-center gap-8">
+                                <button onclick="updatePuntos(-1)" class="w-14 h-14 bg-black rounded-2xl border border-zinc-800 text-2xl font-black">-</button>
+                                <span class="text-6xl font-black text-orange-500">${puntosFidelidad}</span>
+                                <button onclick="updatePuntos(1)" class="w-14 h-14 bg-orange-500 text-black rounded-2xl text-2xl font-bold">+</button>
+                            </div>
                         </div>
-                        <div class="bg-zinc-900 p-10 rounded-[3rem] border border-zinc-800 text-center">
-                            <p class="text-zinc-500 text-xs uppercase mb-2">Control Directo</p>
-                            <h3 class="text-4xl font-black">MODO ADMIN ACTIVADO</h3>
-                        </div>
+                        <p class="text-center text-[10px] text-zinc-700 uppercase mt-10 tracking-[0.2em]">Acceso Directo Jefe: ${userEmail}</p>
                     </div>`;
             } else {
+                // VISTA SOCIO
                 root.innerHTML = `
-                    <div class="p-6">
-                        <header class="flex justify-between items-center mb-10">
+                    <div class="min-h-screen p-6 bg-black">
+                        <header class="flex justify-between items-center mb-8">
                             <div class="flex items-center gap-3">
-                                <img src="${APP_DATABASE.company.logo}" class="w-11 h-11 rounded-full border border-orange-500 object-cover">
-                                <h2 class="text-xl font-black italic uppercase">MAD SHOOTING</h2>
+                                <img src="${APP_DATABASE.company.logo}" class="w-12 h-12 rounded-full border border-orange-500 object-cover">
+                                <h2 class="text-xl font-black italic uppercase tracking-tighter leading-none">MAD SHOOTING</h2>
                             </div>
-                            ${esAdmin ? `<button onclick="toggleAdmin(true)" class="w-11 h-11 rounded-2xl bg-zinc-900 flex items-center justify-center text-zinc-500"><span class="material-icons-round">settings</span></button>` : ''}
+                            ${esAdmin ? `
+                                <button onclick="setAdminView(true)" class="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500">
+                                    <span class="material-icons-round text-2xl">settings</span>
+                                </button>
+                            ` : ''}
                         </header>
-                        <div class="bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-800 text-center mb-10">
-                            <p class="text-zinc-500 text-[10px] uppercase font-black mb-2">Bienvenido</p>
-                            <p class="text-2xl font-black uppercase italic">${emailLogueado.split('@')[0]}</p>
+
+                        <div class="bg-gradient-to-br from-zinc-900 to-black p-10 rounded-[3rem] border border-zinc-800 text-center shadow-2xl mb-12 relative overflow-hidden">
+                            <div class="absolute -right-4 -top-4 text-orange-500/5 text-[120px] font-black italic uppercase leading-none">MAD</div>
+                            <p class="text-[11px] text-zinc-500 uppercase tracking-widest mb-4 font-black">Fidelidad Socio</p>
+                            <div class="flex items-center justify-center gap-3 relative z-10">
+                                <span class="text-8xl font-black text-orange-500 leading-none">${puntosFidelidad}</span>
+                                <span class="text-zinc-700 font-black text-2xl mb-2">/ 10</span>
+                            </div>
                         </div>
+
                         <div class="space-y-4">
-                            ${APP_DATABASE.proximasSesiones.map(s => `
-                                <div class="bg-zinc-900/40 p-6 rounded-[2.5rem] border border-zinc-800/40 flex justify-between items-center">
-                                    <div><h4 class="font-black italic uppercase">${s.tema}</h4><p class="text-[10px] text-zinc-500 uppercase">${s.fecha}</p></div>
-                                    <button class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-xl uppercase">Reserva</button>
+                            <p class="text-[10px] font-black text-zinc-800 uppercase tracking-[0.5em] mb-4">Shootings Próximos</p>
+                            ${APP_DATABASE.sesiones.map(s => `
+                                <div class="bg-zinc-900/40 p-6 rounded-[2.5rem] border border-zinc-800/40 flex justify-between items-center active:scale-[0.98] transition-all">
+                                    <div>
+                                        <h4 class="text-base font-black italic uppercase text-white tracking-tight leading-none">${s.tema}</h4>
+                                        <p class="text-[10px] text-zinc-500 font-bold uppercase mt-2 tracking-widest">${s.fecha}</p>
+                                    </div>
+                                    <button class="bg-white text-black text-[10px] font-black px-5 py-2.5 rounded-xl uppercase shadow-md">Reserva</button>
                                 </div>
                             `).join('')}
                         </div>
+                        
+                        <button onclick="logout()" class="mt-20 w-full text-zinc-800 text-[9px] font-black uppercase py-10 border-t border-zinc-900">Cerrar Sesión</button>
                     </div>`;
             }
         }
 
-        window.login = () => {
-            emailLogueado = document.getElementById('emailField').value;
-            renderApp();
+        // Lógica de funciones
+        window.doLogin = () => {
+            const email = document.getElementById('emailInput').value;
+            if (email.includes('@')) {
+                userEmail = email;
+                render();
+            } else { alert("Email no válido"); }
         };
 
-        window.toggleAdmin = (val) => {
-            isAdminMode = val;
-            renderApp();
-        };
+        window.logout = () => { userEmail = ""; isAdminView = false; render(); };
+        window.setAdminView = (val) => { isAdminView = val; render(); };
+        window.updatePuntos = (val) => { puntosFidelidad = Math.max(0, puntosFidelidad + val); render(); };
 
-        renderApp();
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mad Shooting</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
-</head>
-<body class="bg-black text-white font-sans">
-    <div id="root"></div>
-
-    <script>
-        // --- TU BASE DE DATOS ---
-        const APP_DATABASE = {
-            company: {
-                name: "Mad Shooting",
-                logo: "https://raw.githubusercontent.com/FelixBartolome/MadShooting/main/Maddie.png"
-            },
-            admin: { email: "info@bartolomephotography.es" },
-            proximasSesiones: [
-                { id: 301, tema: "GOLDEN HOUR", fecha: "SÁB 08 MAR" },
-                { id: 302, tema: "URBAN STYLE", fecha: "DOM 16 MAR" }
-            ]
-        };
-
-        // Estado básico
-        let emailLogueado = "";
-        let isAdminMode = false;
-
-        function renderApp() {
-            const root = document.getElementById('root');
-            const esAdmin = emailLogueado.toLowerCase().trim() === APP_DATABASE.admin.email.toLowerCase();
-
-            if (!emailLogueado) {
-                root.innerHTML = `
-                    <div class="min-h-screen flex flex-col items-center justify-center px-10 text-center">
-                        <img src="${APP_DATABASE.company.logo}" class="w-40 h-40 rounded-full border-2 border-orange-500 mb-8 object-cover">
-                        <h1 class="text-4xl font-black italic uppercase mb-1">${APP_DATABASE.company.name}</h1>
-                        <p class="text-orange-500 font-black uppercase text-[10px] mb-12 italic">Cinematic Club</p>
-                        <input id="emailField" type="email" placeholder="Email" class="w-full bg-zinc-900 border border-zinc-800 p-5 rounded-2xl text-sm mb-3 outline-none focus:border-orange-500">
-                        <button onclick="login()" class="w-full py-5 bg-orange-500 text-black font-black uppercase text-xs rounded-2xl">Entrar</button>
-                    </div>`;
-            } else if (isAdminMode) {
-                root.innerHTML = `
-                    <div class="p-6">
-                        <div class="flex justify-between items-center mb-10">
-                            <h2 class="text-2xl font-black text-orange-500 uppercase italic">Panel Jefe</h2>
-                            <button onclick="toggleAdmin(false)" class="bg-white text-black px-5 py-2 rounded-full text-[10px] font-black uppercase">Cerrar</button>
-                        </div>
-                        <div class="bg-zinc-900 p-10 rounded-[3rem] border border-zinc-800 text-center">
-                            <p class="text-zinc-500 text-xs uppercase mb-2">Control Directo</p>
-                            <h3 class="text-4xl font-black">MODO ADMIN ACTIVADO</h3>
-                        </div>
-                    </div>`;
-            } else {
-                root.innerHTML = `
-                    <div class="p-6">
-                        <header class="flex justify-between items-center mb-10">
-                            <div class="flex items-center gap-3">
-                                <img src="${APP_DATABASE.company.logo}" class="w-11 h-11 rounded-full border border-orange-500 object-cover">
-                                <h2 class="text-xl font-black italic uppercase">MAD SHOOTING</h2>
-                            </div>
-                            ${esAdmin ? `<button onclick="toggleAdmin(true)" class="w-11 h-11 rounded-2xl bg-zinc-900 flex items-center justify-center text-zinc-500"><span class="material-icons-round">settings</span></button>` : ''}
-                        </header>
-                        <div class="bg-zinc-900 p-8 rounded-[2.5rem] border border-zinc-800 text-center mb-10">
-                            <p class="text-zinc-500 text-[10px] uppercase font-black mb-2">Bienvenido</p>
-                            <p class="text-2xl font-black uppercase italic">${emailLogueado.split('@')[0]}</p>
-                        </div>
-                        <div class="space-y-4">
-                            ${APP_DATABASE.proximasSesiones.map(s => `
-                                <div class="bg-zinc-900/40 p-6 rounded-[2.5rem] border border-zinc-800/40 flex justify-between items-center">
-                                    <div><h4 class="font-black italic uppercase">${s.tema}</h4><p class="text-[10px] text-zinc-500 uppercase">${s.fecha}</p></div>
-                                    <button class="bg-white text-black text-[10px] font-black px-4 py-2 rounded-xl uppercase">Reserva</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>`;
-            }
-        }
-
-        window.login = () => {
-            emailLogueado = document.getElementById('emailField').value;
-            renderApp();
-        };
-
-        window.toggleAdmin = (val) => {
-            isAdminMode = val;
-            renderApp();
-        };
-
-        renderApp();
+        // Primer renderizado
+        render();
     </script>
 </body>
 </html>
