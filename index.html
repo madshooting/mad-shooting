@@ -3,35 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD V5</title>
-    <script type="module" src="/assets/index-c_2nedgz.js"></script>
-    <link rel="stylesheet" href="/assets/index-Di99_S8u.css">
+    <title>MAD SHOOTING | PANEL</title>
+    <script type="module" src="./assets/index-c_2nedgz.js"></script>
+    <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
     <style>
+        /* ESTO CORRIGE EL DISEÑO GIGANTE */
+        body { 
+            background-color: #000 !important; 
+            margin: 0 !important; 
+            display: flex !important; 
+            justify-content: center !important; 
+            align-items: flex-start !important; 
+            min-height: 100vh !important;
+        }
+        #root { 
+            width: 100% !important; 
+            max-width: 430px !important; /* Ancho de un iPhone Pro Max */
+            margin: 0 auto !important;
+            min-height: 100vh !important;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+        /* Botones de gestión */
         .btn-borrar-mad {
-            position: absolute !important; top: 10px !important; right: 10px !important;
+            position: absolute !important; top: 15px !important; right: 15px !important;
             background: #2563eb !important; color: white !important;
-            border: 2px solid white !important; border-radius: 10px !important;
-            padding: 8px !important; z-index: 99999 !important; font-weight: bold !important;
+            border: none !important; border-radius: 8px !important;
+            padding: 6px 12px !important; z-index: 99999 !important; font-size: 10px !important;
+            font-weight: bold !important; cursor: pointer !important;
         }
     </style>
 </head>
-<body class="bg-black">
+<body>
     <div id="root"></div>
     <script>
+        // Entrar directo como jefe
+        localStorage.setItem('userEmail', 'info@bartolomephotography.es');
+        localStorage.setItem('isAdmin', 'true');
+
         setInterval(() => {
-            document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]').forEach(t => {
+            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
+            tarjetas.forEach(t => {
                 if ((t.innerText.includes('MAR') || t.innerText.includes('Reserva')) && !t.querySelector('.btn-borrar-mad')) {
                     t.style.position = 'relative';
                     const b = document.createElement('button');
                     b.className = 'btn-borrar-mad';
-                    b.innerHTML = 'ELIMINAR';
-                    b.onclick = (e) => { e.stopPropagation(); if(confirm('¿Borrar?')) t.remove(); };
+                    b.innerHTML = 'BORRAR';
+                    b.onclick = (e) => { e.stopPropagation(); if(confirm('¿Borrar sesión?')) t.remove(); };
                     t.appendChild(b);
                     const h = t.querySelector('h4, .font-black');
                     if(h) h.contentEditable = "true";
                 }
             });
-        }, 1000);
+        }, 1500);
     </script>
 </body>
 </html>
