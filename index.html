@@ -3,70 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD SHOOTING | PANEL</title>
+    <title>Mad Shooting</title>
     <script type="module" src="./assets/index-c_2nedgz.js"></script>
     <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
+    
     <style>
-        /* Bloqueamos el tamaño para que no se desparrame */
-        body { background-color: #000 !important; margin: 0; padding: 0; }
-        #root { max-width: 450px !important; margin: 0 auto !important; }
-
-        /* Botón de borrar: Ahora es pequeño y elegante */
+        /* Bloqueo para que no se vea gigante */
+        body { background: #000 !important; margin: 0; padding: 0; }
+        #root { max-width: 450px !important; margin: 0 auto !important; position: relative; }
+        
+        /* Botón de borrar discreto */
         .btn-borrar-mad {
-            position: absolute !important;
-            top: 10px !important;
-            right: 10px !important;
-            background: #ef4444 !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 5px !important;
-            padding: 4px 8px !important;
-            font-size: 10px !important;
-            font-weight: bold !important;
-            z-index: 9999 !important;
-            cursor: pointer !important;
+            position: absolute !important; top: 10px !important; right: 10px !important;
+            background: rgba(239, 68, 68, 0.8) !important; color: white !important;
+            border: none !important; border-radius: 4px !important;
+            padding: 4px 8px !important; font-size: 10px !important; z-index: 9999 !important;
         }
-        /* Solo mostramos borde naranja al tocar el texto */
-        [contenteditable="true"]:focus { outline: 1px dashed #f97316 !important; }
     </style>
 </head>
 <body>
     <div id="root"></div>
+
     <script>
-        // Logueo automático
+        // Forzamos acceso
         localStorage.setItem('userEmail', 'info@bartolomephotography.es');
         localStorage.setItem('isAdmin', 'true');
 
-        function limpiarDashboard() {
-            // Buscamos las tarjetas
-            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
-            
+        function parcheLimpio() {
+            // Buscamos solo las tarjetas de sesiones, ignoramos el resto
+            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40');
             tarjetas.forEach(t => {
-                const texto = t.innerText.toUpperCase();
-                
-                // REGLA DE ORO: Solo si tiene FECHAS y NO es contacto
-                const esSesion = (texto.includes('MAR') || texto.includes('FEB') || texto.includes('RESERVA'));
-                const esContacto = (texto.includes('DUDAS') || texto.includes('WHATSAPP') || texto.includes('CONTACTO'));
-
-                if (esSesion && !esContacto && !t.querySelector('.btn-borrar-mad')) {
+                const txt = t.innerText.toUpperCase();
+                // Solo si tiene fecha y NO tiene ya el botón
+                if ((txt.includes('MAR') || txt.includes('FEB') || txt.includes('RESERVA')) && !t.querySelector('.btn-borrar-mad')) {
                     t.style.position = 'relative';
                     const b = document.createElement('button');
                     b.className = 'btn-borrar-mad';
                     b.innerText = 'BORRAR';
                     b.onclick = (e) => {
                         e.stopPropagation();
-                        if(confirm('¿Quitar este shooting?')) t.remove();
+                        if(confirm('¿Quitar de la pantalla?')) t.remove();
                     };
                     t.appendChild(b);
 
-                    // Hacer editable solo el título (h4)
-                    const h4 = t.querySelector('h4');
-                    if(h4) h4.contentEditable = "true";
+                    // Solo el título es editable
+                    const h = t.querySelector('h4');
+                    if(h) h.contentEditable = "true";
                 }
             });
         }
-
-        setInterval(limpiarDashboard, 1500);
+        setInterval(parcheLimpio, 1500);
     </script>
 </body>
 </html>
