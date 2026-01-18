@@ -3,56 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mad Shooting</title>
+    <title>MAD SHOOTING | FIXED</title>
     <script type="module" src="./assets/index-c_2nedgz.js"></script>
     <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
-    
     <style>
-        /* Bloqueo para que no se vea gigante */
-        body { background: #000 !important; margin: 0; padding: 0; }
-        #root { max-width: 450px !important; margin: 0 auto !important; position: relative; }
-        
-        /* Botón de borrar discreto */
+        /* RESET TOTAL Y BLOQUEO DE TAMAÑO */
+        html, body {
+            background-color: #000 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            overflow: hidden !important; /* Evita que se mueva de lado */
+        }
+
+        #root {
+            width: 100vw !important;
+            max-width: 430px !important; /* Ancho iPhone */
+            margin: 0 auto !important;
+            height: 100vh !important;
+            overflow-y: auto !important; /* Solo permite scroll vertical */
+            background: #000 !important;
+            /* EL TRUCO: Escalar un poco hacia abajo si se ve muy grande */
+            transform: scale(0.98); 
+            transform-origin: top center;
+        }
+
+        /* Forzamos que las imágenes de Maddie y sesiones no desborden */
+        img {
+            max-width: 90% !important;
+            height: auto !important;
+            margin: 0 auto !important;
+            display: block !important;
+            border-radius: 15px !important;
+        }
+
+        /* Botón de borrar muy pequeño para no estorbar */
         .btn-borrar-mad {
-            position: absolute !important; top: 10px !important; right: 10px !important;
-            background: rgba(239, 68, 68, 0.8) !important; color: white !important;
-            border: none !important; border-radius: 4px !important;
-            padding: 4px 8px !important; font-size: 10px !important; z-index: 9999 !important;
+            position: absolute !important;
+            top: 5px !important;
+            right: 5px !important;
+            background: rgba(255, 0, 0, 0.8) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 3px 6px !important;
+            font-size: 8px !important;
+            z-index: 99999 !important;
+            font-family: sans-serif !important;
         }
     </style>
 </head>
 <body>
     <div id="root"></div>
-
     <script>
-        // Forzamos acceso
         localStorage.setItem('userEmail', 'info@bartolomephotography.es');
         localStorage.setItem('isAdmin', 'true');
 
-        function parcheLimpio() {
-            // Buscamos solo las tarjetas de sesiones, ignoramos el resto
-            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40');
-            tarjetas.forEach(t => {
-                const txt = t.innerText.toUpperCase();
-                // Solo si tiene fecha y NO tiene ya el botón
-                if ((txt.includes('MAR') || txt.includes('FEB') || txt.includes('RESERVA')) && !t.querySelector('.btn-borrar-mad')) {
-                    t.style.position = 'relative';
+        function aplicarCorreccion() {
+            // Buscamos las tarjetas de sesiones
+            const cards = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
+            cards.forEach(c => {
+                const text = c.innerText.toUpperCase();
+                // Solo sesiones reales, ignoramos logos e iconos
+                if ((text.includes('MAR') || text.includes('RESERVA')) && !text.includes('DUDAS') && !c.querySelector('.btn-borrar-mad')) {
+                    c.style.position = 'relative';
                     const b = document.createElement('button');
                     b.className = 'btn-borrar-mad';
-                    b.innerText = 'BORRAR';
+                    b.innerText = 'QUITAR';
                     b.onclick = (e) => {
                         e.stopPropagation();
-                        if(confirm('¿Quitar de la pantalla?')) t.remove();
+                        if(confirm('¿Eliminar de la vista?')) c.remove();
                     };
-                    t.appendChild(b);
-
-                    // Solo el título es editable
-                    const h = t.querySelector('h4');
+                    c.appendChild(b);
+                    
+                    const h = c.querySelector('h4');
                     if(h) h.contentEditable = "true";
                 }
             });
         }
-        setInterval(parcheLimpio, 1500);
+        setInterval(aplicarCorreccion, 1500);
     </script>
 </body>
 </html>
