@@ -1,13 +1,111 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mad Shooting</title>
-    <script type="module" crossorigin src="./assets/index-c_2nedgz.js"></script>
-    <link rel="stylesheet" crossorigin href="./assets/index-Di99_S8u.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
-</html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mad Shooting App | Professional Photography</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --neon-orange: #FF4500; --dark-bg: #0a0a0a; --glass: rgba(255, 69, 0, 0.1); }
+        body { background-color: var(--dark-bg); color: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
+        .glass-card { background: rgba(20, 20, 20, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 69, 0, 0.2); border-radius: 15px; }
+        .neon-btn { background: var(--neon-orange); box-shadow: 0 0 15px rgba(255, 69, 0, 0.4); transition: 0.3s; }
+        .neon-btn:hover { box-shadow: 0 0 25px rgba(255, 69, 0, 0.7); transform: translateY(-2px); }
+        .maddie-bubble { position: fixed; bottom: 85px; right: 20px; z-index: 100; cursor: pointer; animation: float 3s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .hidden-section { display: none; }
+        .admin-badge { border: 1px solid gold; color: gold; font-size: 0.7rem; padding: 2px 5px; border-radius: 4px; }
+        .nav-active { color: var(--neon-orange); border-top: 2px solid var(--neon-orange); }
+    </style>
+</head>
+<body>
+
+<div class="maddie-bubble" onclick="maddieTalk()">
+    <div class="relative">
+        <div class="bg-white text-black text-xs p-2 rounded-lg absolute -top-12 -left-20 w-32 font-bold shadow-lg" id="maddie-text">
+            ¡Hola! Soy Maddie. ¿Hacemos magia?
+        </div>
+        <img src="https://cdn-icons-png.flaticon.com/512/4712/4712139.png" alt="Maddie" class="w-16 h-16 rounded-full border-2 border-[#FF4500] bg-black">
+    </div>
+</div>
+
+<div id="app-container">
+    <section id="view-auth" class="min-h-screen flex flex-col items-center justify-center p-6">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-black italic text-[#FF4500] mb-2 tracking-tighter">MAD SHOOTING</h1>
+            <p class="text-gray-400">Cinematic Photography Club</p>
+        </div>
+        
+        <div class="glass-card p-8 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-6 text-center" id="auth-title">ÚNETE AL CLUB</h2>
+            <div class="space-y-4">
+                <input type="text" id="reg-name" placeholder="Nombre completo" class="w-full bg-black border border-gray-800 p-3 rounded text-white focus:border-[#FF4500] outline-none">
+                <input type="text" id="reg-insta" placeholder="@Instagram" class="w-full bg-black border border-gray-800 p-3 rounded text-white focus:border-[#FF4500] outline-none">
+                <input type="email" id="reg-email" placeholder="Correo electrónico" class="w-full bg-black border border-gray-800 p-3 rounded text-white focus:border-[#FF4500] outline-none">
+                <input type="password" id="reg-pass" placeholder="Contraseña" class="w-full bg-black border border-gray-800 p-3 rounded text-white focus:border-[#FF4500] outline-none">
+                
+                <button onclick="handleAuth()" class="neon-btn w-full py-4 rounded font-bold uppercase tracking-widest mt-4">ENTRAR AHORA</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="view-home" class="hidden-section p-6 pb-24">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-2xl font-bold">¡Hola, <span id="user-display-name">...</span>!</h2>
+                <div id="admin-indicator" class="hidden"> <span class="admin-badge">ADMIN MODE</span> </div>
+            </div>
+            <button id="admin-gear" class="hidden text-2xl" onclick="showView('view-admin')"><i class="fas fa-cog"></i></button>
+        </header>
+
+        <div id="global-alert" class="hidden bg-orange-600 p-4 rounded-lg mb-6 flex items-center gap-3">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p id="alert-text" class="text-sm font-bold"></p>
+        </div>
+
+        <div class="glass-card p-6 mb-8 text-center relative overflow-hidden">
+            <div class="relative z-10">
+                <p class="text-gray-400 text-sm uppercase tracking-widest">Puntos de Luz</p>
+                <p class="text-5xl font-black text-[#FF4500] my-2" id="user-points">0</p>
+                <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden mt-4">
+                    <div id="fidel-progress" class="bg-[#FF4500] h-full" style="width: 10%"></div>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">¡A la 10ª sesión invitas tú! (Siguiente: GRATIS)</p>
+            </div>
+        </div>
+
+        <h3 class="text-lg font-bold mb-4 italic">PRÓXIMOS SHOOTINGS</h3>
+        <div id="sessions-list" class="space-y-4">
+            </div>
+    </section>
+
+    <section id="view-admin" class="hidden-section p-6 pb-24">
+        <h2 class="text-2xl font-bold mb-6 text-[#FF4500]">PANEL DE GESTIÓN</h2>
+        
+        <div class="glass-card p-4 mb-6">
+            <h3 class="font-bold mb-4 underline">Aviso Global</h3>
+            <input type="text" id="new-alert" placeholder="Escribe un aviso para todos..." class="w-full bg-black border border-gray-700 p-2 rounded text-sm mb-2">
+            <button onclick="updateAlert()" class="bg-white text-black px-4 py-2 rounded text-xs font-bold">PUBLICAR</button>
+        </div>
+
+        <div class="glass-card p-4">
+            <h3 class="font-bold mb-4 underline">Validar Pagos (Ingresa Email)</h3>
+            <input type="email" id="validate-email" placeholder="usuario@correo.com" class="w-full bg-black border border-gray-700 p-2 rounded text-sm mb-2">
+            <button onclick="validateUserPayment()" class="neon-btn w-full py-2 rounded text-sm font-bold">CONFIRMAR RESERVA</button>
+        </div>
+    </section>
+
+    <nav id="bottom-nav" class="hidden-section fixed bottom-0 left-0 right-0 bg-black border-t border-gray-900 flex justify-around p-4 z-50">
+        <button onclick="showView('view-home')" class="nav-item text-gray-500"><i class="fas fa-home text-xl"></i></button>
+        <button onclick="alert('Usa el menú principal para ver sesiones')" class="nav-item text-gray-500"><i class="fas fa-camera-retro text-xl"></i></button>
+        <button onclick="showView('view-profile')" class="nav-item text-gray-500"><i class="fas fa-user text-xl"></i></button>
+    </nav>
+</div>
+
+<script>
+    // --- DATOS INICIALES ---
+    const SESSIONS_DATA = [
+        { id: 1, title: 'DETECTIVE NOIR', date: '21 Febrero', time: '13:00h', photogs: 10, models: 6, price: 15, maps: 'https://maps.google.com' },
+        { id: 2, title: 'HARLEY QUINN (D1)', date: '21 Marzo', time: '17:00h', photogs: 6, models: 3, price: 15, maps: 'https://maps.google.com' },
+        { id: 3, title: '
