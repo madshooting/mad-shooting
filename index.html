@@ -1,14 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mad Shooting</title>
-    <script type="module" crossorigin src="/assets/index-c_2nedgz.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Di99_S8u.css">
-  </head>
-  <body>
+    <script type="module" crossorigin src="./assets/index-c_2nedgz.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Di99_S8u.css">
+    <style>
+        /* Estilo minimalista para el botón de borrar */
+        .btn-borrar-mad {
+            position: absolute !important;
+            top: 5px !important;
+            right: 5px !important;
+            background: rgba(239, 68, 68, 0.8) !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 4px 8px !important;
+            font-size: 10px !important;
+            z-index: 9999 !important;
+            cursor: pointer !important;
+        }
+    </style>
+</head>
+<body>
     <div id="root"></div>
-  </body>
+
+    <script>
+        // Configuración de acceso para el Jefe
+        localStorage.setItem('userEmail', 'info@bartolomephotography.es');
+        localStorage.setItem('isAdmin', 'true');
+
+        function gestionarSesiones() {
+            // Buscamos solo las tarjetas de sesiones (clase bg-zinc-900/40)
+            const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40');
+            
+            tarjetas.forEach(t => {
+                const texto = t.innerText.toUpperCase();
+                
+                // Filtramos para actuar solo en sesiones reales
+                if ((texto.includes('MAR') || texto.includes('FEB') || texto.includes('RESERVA')) 
+                    && !t.querySelector('.btn-borrar-mad')) {
+                    
+                    t.style.position = 'relative';
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-borrar-mad';
+                    btn.innerText = 'BORRAR';
+                    btn.onclick = (e) => {
+                        e.stopPropagation();
+                        if(confirm('¿Eliminar esta sesión de la vista?')) t.remove();
+                    };
+                    t.appendChild(btn);
+
+                    // Hacer editable el título h4 si existe
+                    const titulo = t.querySelector('h4');
+                    if (titulo) titulo.contentEditable = "true";
+                }
+            });
+        }
+
+        // Ejecutar cada 2 segundos
+        setInterval(gestionarSesiones, 2000);
+    </script>
+</body>
 </html>
