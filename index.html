@@ -3,86 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MAD SHOOTING | FIXED</title>
-    <script type="module" src="./assets/index-c_2nedgz.js"></script>
-    <link rel="stylesheet" href="./assets/index-Di99_S8u.css">
-    <style>
-        /* RESET TOTAL Y BLOQUEO DE TAMAÑO */
-        html, body {
-            background-color: #000 !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            overflow: hidden !important; /* Evita que se mueva de lado */
-        }
-
-        #root {
-            width: 100vw !important;
-            max-width: 430px !important; /* Ancho iPhone */
-            margin: 0 auto !important;
-            height: 100vh !important;
-            overflow-y: auto !important; /* Solo permite scroll vertical */
-            background: #000 !important;
-            /* EL TRUCO: Escalar un poco hacia abajo si se ve muy grande */
-            transform: scale(0.98); 
-            transform-origin: top center;
-        }
-
-        /* Forzamos que las imágenes de Maddie y sesiones no desborden */
-        img {
-            max-width: 90% !important;
-            height: auto !important;
-            margin: 0 auto !important;
-            display: block !important;
-            border-radius: 15px !important;
-        }
-
-        /* Botón de borrar muy pequeño para no estorbar */
-        .btn-borrar-mad {
-            position: absolute !important;
-            top: 5px !important;
-            right: 5px !important;
-            background: rgba(255, 0, 0, 0.8) !important;
-            color: white !important;
-            border: none !important;
-            border-radius: 4px !important;
-            padding: 3px 6px !important;
-            font-size: 8px !important;
-            z-index: 99999 !important;
-            font-family: sans-serif !important;
-        }
-    </style>
+    <title>Mad Shooting</title>
+    <script type="module" src="/assets/index-c_2nedgz.js"></script>
+    <link rel="stylesheet" href="/assets/index-Di99_S8u.css">
 </head>
 <body>
     <div id="root"></div>
-    <script>
-        localStorage.setItem('userEmail', 'info@bartolomephotography.es');
-        localStorage.setItem('isAdmin', 'true');
 
-        function aplicarCorreccion() {
-            // Buscamos las tarjetas de sesiones
-            const cards = document.querySelectorAll('.bg-zinc-900\\/40, [class*="rounded"]');
-            cards.forEach(c => {
-                const text = c.innerText.toUpperCase();
-                // Solo sesiones reales, ignoramos logos e iconos
-                if ((text.includes('MAR') || text.includes('RESERVA')) && !text.includes('DUDAS') && !c.querySelector('.btn-borrar-mad')) {
-                    c.style.position = 'relative';
-                    const b = document.createElement('button');
-                    b.className = 'btn-borrar-mad';
-                    b.innerText = 'QUITAR';
-                    b.onclick = (e) => {
-                        e.stopPropagation();
-                        if(confirm('¿Eliminar de la vista?')) c.remove();
-                    };
-                    c.appendChild(b);
-                    
-                    const h = c.querySelector('h4');
-                    if(h) h.contentEditable = "true";
+    <script>
+        // Función básica original para activar edición si eres admin
+        function activarEdicion() {
+            const interval = setInterval(() => {
+                const isAdmin = localStorage.getItem('isAdmin') === 'true';
+                if (isAdmin) {
+                    console.log("Modo edición detectado");
                 }
-            });
+            }, 2000);
         }
-        setInterval(aplicarCorreccion, 1500);
+        activarEdicion();
     </script>
 </body>
 </html>
