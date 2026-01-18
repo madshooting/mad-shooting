@@ -11,12 +11,12 @@
     <div id="root"></div>
 
     <script>
-        // Función básica original para activar edición si eres admin
+        // Este es el script mínimo que tenías al principio
         function activarEdicion() {
             const interval = setInterval(() => {
                 const isAdmin = localStorage.getItem('isAdmin') === 'true';
                 if (isAdmin) {
-                    console.log("Modo edición detectado");
+                    console.log("Modo edición activo");
                 }
             }, 2000);
         }
