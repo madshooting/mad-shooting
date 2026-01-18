@@ -7,60 +7,61 @@
     <script type="module" crossorigin src="./assets/index-c_2nedgz.js"></script>
     <link rel="stylesheet" crossorigin href="./assets/index-Di99_S8u.css">
     <style>
-        /* Estilo minimalista para el botón de borrar */
+        /* Botón de borrar discreto que no rompe el diseño */
         .btn-borrar-mad {
             position: absolute !important;
-            top: 5px !important;
-            right: 5px !important;
-            background: rgba(239, 68, 68, 0.8) !important;
+            top: 10px !important;
+            right: 10px !important;
+            background: rgba(239, 68, 68, 0.9) !important;
             color: white !important;
             border: none !important;
-            border-radius: 4px !important;
-            padding: 4px 8px !important;
+            border-radius: 6px !important;
+            padding: 5px 10px !important;
             font-size: 10px !important;
+            font-weight: bold !important;
             z-index: 9999 !important;
             cursor: pointer !important;
         }
     </style>
 </head>
-<body>
+<body class="bg-black">
     <div id="root"></div>
 
     <script>
-        // Configuración de acceso para el Jefe
+        // Forzamos acceso de Jefe
         localStorage.setItem('userEmail', 'info@bartolomephotography.es');
         localStorage.setItem('isAdmin', 'true');
 
-        function gestionarSesiones() {
-            // Buscamos solo las tarjetas de sesiones (clase bg-zinc-900/40)
+        function activarHerramientas() {
+            // Buscamos solo las tarjetas de sesiones (fondo gris oscuro)
             const tarjetas = document.querySelectorAll('.bg-zinc-900\\/40');
             
             tarjetas.forEach(t => {
-                const texto = t.innerText.toUpperCase();
+                const contenido = t.innerText.toUpperCase();
                 
-                // Filtramos para actuar solo en sesiones reales
-                if ((texto.includes('MAR') || texto.includes('FEB') || texto.includes('RESERVA')) 
+                // Solo actuamos en sesiones, ignorando logos y botones de contacto
+                if ((contenido.includes('MAR') || contenido.includes('FEB') || contenido.includes('RESERVA')) 
                     && !t.querySelector('.btn-borrar-mad')) {
                     
                     t.style.position = 'relative';
                     const btn = document.createElement('button');
                     btn.className = 'btn-borrar-mad';
-                    btn.innerText = 'BORRAR';
+                    btn.innerText = 'ELIMINAR';
                     btn.onclick = (e) => {
                         e.stopPropagation();
-                        if(confirm('¿Eliminar esta sesión de la vista?')) t.remove();
+                        if(confirm('¿Deseas quitar esta sesión?')) t.remove();
                     };
                     t.appendChild(btn);
 
-                    // Hacer editable el título h4 si existe
+                    // Hacer editable el título h4
                     const titulo = t.querySelector('h4');
                     if (titulo) titulo.contentEditable = "true";
                 }
             });
         }
 
-        // Ejecutar cada 2 segundos
-        setInterval(gestionarSesiones, 2000);
+        // Ejecutar cada 2 segundos para asegurar que cargue tras la App
+        setInterval(activarHerramientas, 2000);
     </script>
 </body>
 </html>
